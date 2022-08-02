@@ -1,6 +1,6 @@
 {
   "name": "@cqrs/common",
   "version": "1.0.0",
-  "main": ".",
+  "main": "src/index.ts",
   "license": "MIT"
 }

@@ -1,16 +1,15 @@
-import { Request, Response } from "express";
 import { v4 } from "uuid";
+import { Request, Response } from "express";
+import serialize from "./utils/serialize";
 
 const clients: { [key: string]: Response } & {} = {};
 
 export const addClient = (req: Request, res: Response) => {
   const clientId = v4();
 
-  console.log("new connection");
-
   clients[clientId] = res;
 
-  res.write("data: " + JSON.stringify({ clientId, msg: "Connected" }) + "\n\n");
+  res.write(serialize({ clientId, msg: "Connected" }));
 
   req.on("close", () => {
     res.end();
@@ -29,6 +28,6 @@ export const removeClient = (clientId: string) => {
 export const notifyClient = (data: string, clientId: string, msg: string) => {
   if (clients[clientId]) {
     console.log("notify", clientId);
-    clients[clientId].write("data: " + JSON.stringify({ msg, data, clientId }) + "\n\n");
+    clients[clientId].write(serialize({ msg, data, clientId }));
   }
 };

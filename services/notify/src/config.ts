@@ -3,14 +3,14 @@ import { createKafkaClient, createKafkaConsumer } from "./kafkaClient";
 const createConfig = async ({ env }: any) => {
   const kafkaClient = createKafkaClient({
     clientId: env.kafkaClientId,
-    brokers: [env.kafkaBroker],
+    brokers: env.kafkaBrokers.split(","),
   });
 
   const kafkaConsumer = await createKafkaConsumer({
     kafka: kafkaClient,
-    config: {
-      groupId: env.kafkaGroupId,
-      topic: env.kafkaTopic,
+    groupId: env.kafkaGroupId,
+    subscriptionConfig: {
+      topics: env.kafkaTopics.split(","),
       fromBeginning: false,
     },
   });

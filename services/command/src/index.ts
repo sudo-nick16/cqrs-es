@@ -1,30 +1,19 @@
-import express, { NextFunction, Request, Response } from "express";
-import { Kafka } from "kafkajs";
-import { createUser, updateUser } from "./controllers/user";
-import { wrapAsync } from "@cqrs/common";
-import cors from "cors";
+import createExpressApp from "./app";
+import createConfig from "./config";
+import env from "./env";
 
-(async () => {
-  const app = express();
-  app.use(express.json());
-  app.use(cors());
+const start = async () => {
+  const config = await createConfig({ env });
+  const app = createExpressApp(config);
+  app.listen(env.port, signalSeviceStart);
+};
 
-  const kafka = new Kafka({
-    clientId: "command-service",
-    brokers: ["localhost:9092"],
-  });
-  const producer = kafka.producer();
-  await producer.connect();
+const signalSeviceStart = () => {
+  console.log(`${env.appName} service started on port ${env.port}`);
+  console.table([
+    ["Port", env.port],
+    ["Environment", env.env],
+  ]);
+};
 
-  app.route("/api/users").post(wrapAsync(createUser(producer)));
-  app.route("/api/users").patch(wrapAsync(updateUser(producer)));
-
-  app.use((err: any, _: Request, res: Response, __: NextFunction) => {
-    console.error(err.stack);
-    res.status(500).send("Something broke!");
-  });
-
-  app.listen(5000, () => {
-    console.log("Command Service started on port 5000");
-  });
-})();
+export default start;

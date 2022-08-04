@@ -19,8 +19,7 @@ export default {
   appName: requireFromEnv("APP_NAME"),
   port: parseInt(requireFromEnv("PORT"), 10),
   env: requireFromEnv("NODE_ENV"),
-  kafkaBrokers: requireFromEnv("KAFKA_BROKERS"),
+  kafkaBroker: requireFromEnv("KAFKA_BROKER"),
   kafkaClientId: requireFromEnv("KAFKA_CLIENT_ID"),
-  kafkaTopics: requireFromEnv("KAFKA_TOPICS"),
-  kafkaGroupId: requireFromEnv("KAFKA_GROUP_ID"),
+  kafkaTopic: requireFromEnv("KAFKA_TOPIC"),
 };

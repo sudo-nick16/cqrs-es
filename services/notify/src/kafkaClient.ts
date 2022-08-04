@@ -1,22 +1,23 @@
-import { Consumer, Kafka } from "kafkajs";
-import { KafkaClientProp, KafkaConsumerProp } from "./types";
+import { Consumer, Kafka, KafkaConfig } from "kafkajs";
+import { KafkaConsumerProp } from "./types";
 
-export const createKafkaClient = (config: KafkaClientProp): Kafka => {
+export const createKafkaClient = (config: KafkaConfig): Kafka => {
   const kafka = new Kafka({
     clientId: config.clientId,
-    brokers: [...config.brokers],
+    brokers: config.brokers,
   });
   return kafka;
 };
 
 export const createKafkaConsumer = async ({
   kafka,
-  config,
+  groupId,
+  subscriptionConfig,
 }: KafkaConsumerProp): Promise<Consumer> => {
-  const consumer: Consumer = kafka.consumer({ groupId: config.groupId });
+  const consumer: Consumer = kafka.consumer({ groupId });
   await consumer.connect();
   await consumer.subscribe({
-    ...config,
+    ...subscriptionConfig,
   });
   return consumer;
 };

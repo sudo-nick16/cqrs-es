@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { Producer } from "kafkajs";
-import { USER_CREATED } from "../events";
+import { USER_CREATED, USER_UPDATED } from "@cqrs/common";
+import { CreateUserProp, UpdateUserProp } from "../types";
 
-export const createUser = (producer: Producer) => {
+export const createUser = ({ producer, config }: CreateUserProp) => {
   return async (req: Request, res: Response) => {
     const { name, email, password, username, clientId } = req.body;
     if (!clientId) {
-      throw new Error("Notif service failed");
+      console.error("Notify service failed");
     }
     if (!name || !email || !password || !username) {
       return res.status(400).json({ error: "Please fill all the fields." });
@@ -17,7 +17,7 @@ export const createUser = (producer: Producer) => {
       clientId,
     };
     await producer.send({
-      topic: "users",
+      topic: config.topic,
       messages: [
         {
           key: USER_CREATED,
@@ -31,14 +31,14 @@ export const createUser = (producer: Producer) => {
   };
 };
 
-export const updateUser = (producer: Producer) => {
+export const updateUser = ({ producer, config }: UpdateUserProp) => {
   return async (req: Request, res: Response) => {
     const { name, email, username } = req.body;
     if (!(name || email || username)) {
       return res.status(400).json({ error: "Please fill all the fields." });
     }
     const event = {
-      event: "USER_UPDATED",
+      event: USER_UPDATED,
       fields: {
         name: name || null,
         email: email || null,
@@ -46,10 +46,10 @@ export const updateUser = (producer: Producer) => {
       },
     };
     await producer.send({
-      topic: "users",
+      topic: config.topic,
       messages: [
         {
-          key: "USER_UPDATED",
+          key: USER_UPDATED,
           value: JSON.stringify(event),
           timestamp: Date.toString(),
         },

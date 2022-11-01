@@ -1,6 +1,6 @@
-### CQRS-eventsourcing
+### CQRS
 
-This is a simple CQRS-eventsourcing example.
+This is a simple CQRS example.
 
 Tech stack:
 1. Kafka
